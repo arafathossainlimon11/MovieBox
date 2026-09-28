@@ -61,13 +61,15 @@
 
     /* Category Buttons */
     .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; background: #161b22; margin-bottom: 10px; }
-    .cat-btn { background: #e11d48; color: #fff; text-align: center; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 12px; text-decoration: none; cursor: pointer; transition: 0.2s; }
+    .cat-btn { background: #e11d48; color: #fff; text-align: center; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 12px; text-decoration: none; cursor: pointer; transition: 0.2s; border: none; }
     .cat-btn:active, .cat-btn.active { background: #be123c; transform: scale(0.96); }
 
-    /* Search Bar */
-    .search-box { padding: 0 12px 12px 12px; }
-    .search-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #21262d; color: #fff; font-size: 14px; outline: none; }
+    /* Search Bar Layout with Button */
+    .search-box { padding: 0 12px 12px 12px; display: flex; gap: 8px; }
+    .search-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #21262d; color: #fff; font-size: 14px; outline: none; }
     .search-input:focus { border-color: #58a6ff; }
+    .search-btn { background: #2563eb; color: #fff; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 13px; white-space: nowrap; transition: 0.2s; }
+    .search-btn:active { background: #1d4ed8; transform: scale(0.95); }
 
     /* 2-Column Movie Grid Layout */
     .movie-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
@@ -176,7 +178,7 @@
       <a href="#" class="logo" onclick="showView('home-view')">MOVIEBOX</a>
     </div>
 
-    <!-- Facebook Group Join Banner Under MOVIEBOX -->
+    <!-- Facebook Group Join Banner -->
     <a href="https://facebook.com/groups/1825203915487489/" target="_blank" class="fb-banner">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       <span>Join Facebook Group for Requests</span>
@@ -197,8 +199,10 @@
       <div class="cat-btn" onclick="filterCategory('Series', this)">Series</div>
     </div>
 
+    <!-- Search Box with Search Button -->
     <div class="search-box">
-      <input type="text" id="search-input" class="search-input" placeholder="Movie বা Series-এর English নাম লিখুন..." oninput="handleSearch()">
+      <input type="text" id="search-input" class="search-input" placeholder="Movie বা Series-এর English নাম লিখুন..." oninput="handleSearch()" onkeypress="if(event.key==='Enter') handleSearch()">
+      <button class="search-btn" onclick="handleSearch()">🔍 Search</button>
     </div>
 
     <div id="movie-grid" class="movie-container"></div>
@@ -231,11 +235,14 @@
   <div id="download-view" class="view-section" style="text-align: center;">
     <h2 id="dl-title" style="color: #f0f6fc; margin-bottom: 20px; line-height: 1.3;">Choose Server</h2>
     
-    <a id="ad-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #dc2626, #f59e0b);">[⚡ FAST SPONSOR SERVER DOWNLOAD]</a>
+    <!-- Sponsor / Ad Download Button (Top) -->
+    <a id="ad-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #dc2626, #f59e0b);" onclick="popAd()">[⚡ FAST SPONSOR SERVER DOWNLOAD]</a>
     
-    <a id="real-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="handleRealDownloadClick()">[⬇ ORIGINAL DIRECT SERVER DOWNLOAD]</a>
-
+    <!-- Adsterra 300x250 Banner Holder Slot (Middle) -->
     <div id="ad-300-slot-p4" style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center; min-height: 250px; align-items: center;"></div>
+
+    <!-- Original Direct Download Link at the Bottom (Below Ad Box) -->
+    <a id="real-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="handleRealDownloadClick(event)">[⬇ ORIGINAL DIRECT SERVER DOWNLOAD]</a>
   </div>
 
   <!-- Firebase Integration Script -->
@@ -263,16 +270,16 @@
     const itemsPerPage = 20;
     let selectedLink = "";
     let selectedTitle = "";
+    let realDlAdClicked = false;
 
     // Adsterra Direct Smartlink
     const DIRECT_AD_LINK = "https://www.profitableratecpmnetwork.com/ug9nqqybq?key=9f2fdc24609da9c7f62de27790487d6c";
 
-    // Ad Trigger Helper
-    function popAd() {
+    window.popAd = function() {
       if (DIRECT_AD_LINK) {
         window.open(DIRECT_AD_LINK, '_blank');
       }
-    }
+    };
 
     window.handleCardClick = function(id) {
       popAd();
@@ -289,8 +296,16 @@
       goToPage4();
     };
 
-    window.handleRealDownloadClick = function() {
-      popAd();
+    // 2-Tap Real Download Link Handler (1st tap: Ad, 2nd tap: Direct Link)
+    window.handleRealDownloadClick = function(e) {
+      if (!realDlAdClicked) {
+        e.preventDefault();
+        realDlAdClicked = true;
+        popAd();
+      } else {
+        realDlAdClicked = false;
+        // Proceed to open selectedLink
+      }
     };
 
     // Safe Dynamic Adsterra Iframe Generator
@@ -459,7 +474,6 @@
       const container = document.getElementById('det-links-container');
       container.innerHTML = "";
 
-      // Single Template Episode Box Rendering
       if (movie.episodes && movie.episodes.length > 0) {
         movie.episodes.forEach(ep => {
           const isNewTag = ep.isNew ? '<span class="tag-new">[New]</span>' : '';
@@ -484,7 +498,6 @@
           `;
         });
       } else if (movie.links && movie.links.length > 0) {
-        // Legacy Links grouping fallback
         let qualitiesHtml = '';
         movie.links.forEach(link => {
           qualitiesHtml += `
@@ -518,6 +531,7 @@
     }
 
     function goToPage4() {
+      realDlAdClicked = false; // Reset 2-tap state
       document.getElementById('dl-title').innerText = selectedTitle;
       document.getElementById('real-dl-btn').href = selectedLink;
       document.getElementById('ad-dl-btn').href = DIRECT_AD_LINK;
@@ -541,4 +555,4 @@
     history.replaceState({ view: 'home-view' }, '', '#home-view');
   </script>
 </body>
-  </html>
+        </html>
