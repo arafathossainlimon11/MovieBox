@@ -17,7 +17,10 @@
     .btn-add-link { background: #059669; margin-top: 5px; }
     .btn-add-link:hover { background: #047857; }
     .btn-cancel { background: #64748b; margin-top: 5px; }
-    .link-input-group { display: flex; gap: 8px; margin-top: 8px; }
+    .link-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-top: 10px; }
+    .link-card-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #ef4444; cursor: pointer; }
+    .checkbox-label input { width: auto; }
     .login-box { max-width: 350px; margin: 100px auto; background: #1e293b; padding: 25px; border-radius: 10px; text-align: center; }
     .hidden { display: none; }
     .movie-list { margin-top: 30px; }
@@ -53,7 +56,7 @@
 
       <div class="form-group">
         <label>মুভি / সিরিজের নাম</label>
-        <input type="text" id="title" placeholder="যেমন: Avatar 3" required>
+        <input type="text" id="title" placeholder="যেমন: Overgeared Season 01" required>
       </div>
 
       <div class="form-group">
@@ -78,7 +81,7 @@
       <div style="display: flex; gap: 10px;">
         <div class="form-group" style="flex: 1;">
           <label>রেটিং (Rating)</label>
-          <input type="text" id="rating" placeholder="⭐ 8.5">
+          <input type="text" id="rating" placeholder="⭐ 9.5">
         </div>
         <div class="form-group" style="flex: 1;">
           <label>রিলিজ বছর (Year)</label>
@@ -88,7 +91,7 @@
 
       <div class="form-group">
         <label>ভাষা (Language)</label>
-        <input type="text" id="language" placeholder="English / Dual Audio">
+        <input type="text" id="language" placeholder="Hindi, Tamil, Telugu, English">
       </div>
 
       <div class="form-group">
@@ -98,14 +101,9 @@
 
       <!-- ডাউনলোড লিংক ও এপিসোড সেকশন -->
       <div class="form-group">
-        <label id="links-label">ডাউনলোড লিংকসমূহ (Quality & Links)</label>
-        <div id="links-container">
-          <div class="link-input-group">
-            <input type="text" placeholder="কোয়ালিটি / এপিসোড (যেমন: 720p বা Episode 01)" class="link-label" required>
-            <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" required>
-          </div>
-        </div>
-        <button type="button" class="btn-add-link" onclick="addLinkField()">+ নতুন লিংক/এপিসোড যোগ করুন</button>
+        <label>ডাউনলোড লিংক ও এপিসোডসমূহ</label>
+        <div id="links-container"></div>
+        <button type="button" class="btn-add-link" onclick="addLinkCard()">+ নতুন এপিসোড / কোয়ালিটি যোগ করুন</button>
       </div>
 
       <button type="submit" id="submit-btn">Publish Content</button>
@@ -153,13 +151,25 @@
       }
     };
 
-    window.addLinkField = function(labelVal = "", urlVal = "") {
+    window.addLinkCard = function(labelVal = "", urlVal = "", isNew = false, dateVal = "") {
       const container = document.getElementById('links-container');
       const div = document.createElement('div');
-      div.className = 'link-input-group';
+      div.className = 'link-card';
+      
+      const today = new Date().toLocaleDateString('en-GB'); // DD/MM/YYYY
+      const uploadDate = dateVal || today;
+
       div.innerHTML = `
-        <input type="text" placeholder="কোয়ালিটি / এপিসোড" class="link-label" value="${labelVal}" required>
-        <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" value="${urlVal}" required>
+        <div class="link-card-row">
+          <input type="text" placeholder="এপিসোড / কোয়ালিটি (যেমন: Episode: 01 720p)" class="link-label" value="${labelVal}" required>
+          <label class="checkbox-label">
+            <input type="checkbox" class="link-is-new" ${isNew ? 'checked' : ''}> [New] Tag
+          </label>
+        </div>
+        <div class="link-card-row">
+          <input type="text" placeholder="আপলোড তারিখ (যেমন: 28/09/2026)" class="link-date" value="${uploadDate}">
+          <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" value="${urlVal}" required>
+        </div>
       `;
       container.appendChild(div);
     };
@@ -169,11 +179,8 @@
       document.getElementById('movie-form').reset();
       document.getElementById('submit-btn').innerText = "Publish Content";
       document.getElementById('cancel-edit-btn').classList.add('hidden');
-      document.getElementById('links-container').innerHTML = `
-        <div class="link-input-group">
-          <input type="text" placeholder="কোয়ালিটি / এপিসোড" class="link-label" required>
-          <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" required>
-        </div>`;
+      document.getElementById('links-container').innerHTML = '';
+      addLinkCard();
     };
 
     document.getElementById('movie-form').addEventListener('submit', function(e) {
@@ -181,11 +188,18 @@
       
       const labels = document.querySelectorAll('.link-label');
       const urls = document.querySelectorAll('.link-url');
+      const isNews = document.querySelectorAll('.link-is-new');
+      const dates = document.querySelectorAll('.link-date');
       const links = [];
 
       labels.forEach((label, index) => {
         if(label.value && urls[index].value) {
-          links.push({ label: label.value, url: urls[index].value });
+          links.push({ 
+            label: label.value, 
+            url: urls[index].value,
+            isNew: isNews[index].checked,
+            date: dates[index].value || ""
+          });
         }
       });
 
@@ -203,13 +217,11 @@
       };
 
       if (editingId) {
-        // Update existing movie
         set(ref(db, 'movies/' + editingId), movieData).then(() => {
           alert("সফলভাবে আপডেট করা হয়েছে এবং ওপরে নিয়ে যাওয়া হয়েছে!");
           resetForm();
         });
       } else {
-        // Publish new movie
         const newRef = push(ref(db, 'movies'));
         set(newRef, movieData).then(() => {
           alert("সফলভাবে পোস্ট করা হয়েছে!");
@@ -263,10 +275,10 @@
       
       if (movie.links && movie.links.length > 0) {
         movie.links.forEach(link => {
-          addLinkField(link.label, link.url);
+          addLinkCard(link.label, link.url, link.isNew || false, link.date || "");
         });
       } else {
-        addLinkField();
+        addLinkCard();
       }
 
       document.getElementById('submit-btn').innerText = "Update Content (Bump to Top)";
@@ -279,6 +291,9 @@
         remove(ref(db, 'movies/' + id));
       }
     };
+
+    // Initialize with 1 link card
+    addLinkCard();
   </script>
 </body>
-</html>
+          </html>
