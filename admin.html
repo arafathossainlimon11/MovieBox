@@ -16,17 +16,20 @@
     button:hover { background: #1d4ed8; }
     .btn-add-link { background: #059669; margin-top: 5px; }
     .btn-add-link:hover { background: #047857; }
+    .btn-cancel { background: #64748b; margin-top: 5px; }
     .link-input-group { display: flex; gap: 8px; margin-top: 8px; }
     .login-box { max-width: 350px; margin: 100px auto; background: #1e293b; padding: 25px; border-radius: 10px; text-align: center; }
     .hidden { display: none; }
     .movie-list { margin-top: 30px; }
     .movie-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; margin-top: 8px; border-radius: 6px; border: 1px solid #334155; }
+    .action-btns { display: flex; gap: 6px; }
+    .btn-edit { background: #d97706; padding: 6px 12px; font-size: 12px; width: auto; margin: 0; }
     .btn-delete { background: #dc2626; padding: 6px 12px; font-size: 12px; width: auto; margin: 0; }
   </style>
 </head>
 <body>
 
-  <!-- গোপন লগইন সেকশন (পাসওয়ার্ড সম্পূর্ণ হাইড থাকবে) -->
+  <!-- গোপন লগইন সেকশন -->
   <div id="login-section" class="login-box">
     <h2>Admin Login</h2>
     <div class="form-group">
@@ -106,6 +109,7 @@
       </div>
 
       <button type="submit" id="submit-btn">Publish Content</button>
+      <button type="button" id="cancel-edit-btn" class="btn-cancel hidden" onclick="resetForm()">Cancel Editing</button>
     </form>
 
     <!-- পোস্ট করা মুভির তালিকা -->
@@ -120,7 +124,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // ফায়ারবেস কনফিগারেশন
     const firebaseConfig = {
       apiKey: "AIzaSyBZPX85Wl0-vBE7Vm1NBuVoiBzVmp9xU0o",
       authDomain: "moviebox-6dca4.firebaseapp.com",
@@ -135,8 +138,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // আপনার দেওয়া গোপন পাসওয়ার্ড
     const SECRET_PASS = "arafat01721313101";
+    let editingId = null;
+    let moviesCache = {};
 
     window.login = function() {
       const pass = document.getElementById('admin-pass').value;
@@ -149,15 +153,27 @@
       }
     };
 
-    window.addLinkField = function() {
+    window.addLinkField = function(labelVal = "", urlVal = "") {
       const container = document.getElementById('links-container');
       const div = document.createElement('div');
       div.className = 'link-input-group';
       div.innerHTML = `
-        <input type="text" placeholder="কোয়ালিটি / এপিসোড" class="link-label" required>
-        <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" required>
+        <input type="text" placeholder="কোয়ালিটি / এপিসোড" class="link-label" value="${labelVal}" required>
+        <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" value="${urlVal}" required>
       `;
       container.appendChild(div);
+    };
+
+    window.resetForm = function() {
+      editingId = null;
+      document.getElementById('movie-form').reset();
+      document.getElementById('submit-btn').innerText = "Publish Content";
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      document.getElementById('links-container').innerHTML = `
+        <div class="link-input-group">
+          <input type="text" placeholder="কোয়ালিটি / এপিসোড" class="link-label" required>
+          <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" required>
+        </div>`;
     };
 
     document.getElementById('movie-form').addEventListener('submit', function(e) {
@@ -183,39 +199,80 @@
         language: document.getElementById('language').value || "Dual Audio",
         synopsis: document.getElementById('synopsis').value || "",
         links: links,
-        timestamp: Date.now()
+        timestamp: Date.now() // updates time to bump to top
       };
 
-      const newRef = push(ref(db, 'movies'));
-      set(newRef, movieData).then(() => {
-        alert("সফলভাবে পোস্ট করা হয়েছে!");
-        document.getElementById('movie-form').reset();
-        document.getElementById('links-container').innerHTML = `
-          <div class="link-input-group">
-            <input type="text" placeholder="কোয়ালিটি / এপিসোড" class="link-label" required>
-            <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" required>
-          </div>`;
-      });
+      if (editingId) {
+        // Update existing movie
+        set(ref(db, 'movies/' + editingId), movieData).then(() => {
+          alert("সফলভাবে আপডেট করা হয়েছে এবং ওপরে নিয়ে যাওয়া হয়েছে!");
+          resetForm();
+        });
+      } else {
+        // Publish new movie
+        const newRef = push(ref(db, 'movies'));
+        set(newRef, movieData).then(() => {
+          alert("সফলভাবে পোস্ট করা হয়েছে!");
+          resetForm();
+        });
+      }
     });
 
     function loadMovies() {
       onValue(ref(db, 'movies'), (snapshot) => {
         const itemsDiv = document.getElementById('movie-items');
         itemsDiv.innerHTML = "";
+        moviesCache = {};
+
         snapshot.forEach((child) => {
           const movie = child.val();
           const id = child.key;
+          moviesCache[id] = movie;
+
           itemsDiv.innerHTML += `
             <div class="movie-item">
               <div>
                 <strong>${movie.title}</strong> (${movie.category})
               </div>
-              <button class="btn-delete" onclick="deleteMovie('${id}')">Delete</button>
+              <div class="action-btns">
+                <button class="btn-edit" onclick="editMovie('${id}')">Edit</button>
+                <button class="btn-delete" onclick="deleteMovie('${id}')">Delete</button>
+              </div>
             </div>
           `;
         });
       });
     }
+
+    window.editMovie = function(id) {
+      const movie = moviesCache[id];
+      if (!movie) return;
+
+      editingId = id;
+      document.getElementById('type').value = movie.type || 'movie';
+      document.getElementById('title').value = movie.title || '';
+      document.getElementById('poster').value = movie.poster || '';
+      document.getElementById('category').value = movie.category || 'Hindi';
+      document.getElementById('rating').value = movie.rating || '';
+      document.getElementById('year').value = movie.year || '';
+      document.getElementById('language').value = movie.language || '';
+      document.getElementById('synopsis').value = movie.synopsis || '';
+
+      const container = document.getElementById('links-container');
+      container.innerHTML = '';
+      
+      if (movie.links && movie.links.length > 0) {
+        movie.links.forEach(link => {
+          addLinkField(link.label, link.url);
+        });
+      } else {
+        addLinkField();
+      }
+
+      document.getElementById('submit-btn').innerText = "Update Content (Bump to Top)";
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     window.deleteMovie = function(id) {
       if(confirm("সত্যিই মুছে ফেলতে চান?")) {
@@ -224,4 +281,4 @@
     };
   </script>
 </body>
-            </html>
+</html>
