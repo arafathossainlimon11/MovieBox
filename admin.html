@@ -7,20 +7,33 @@
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
     body { background: #0f172a; color: #f8fafc; padding: 15px; }
-    .container { max-width: 600px; margin: auto; background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .container { max-width: 650px; margin: auto; background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     h2 { text-align: center; margin-bottom: 20px; color: #38bdf8; }
     .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-size: 14px; color: #cbd5e1; }
+    label { display: block; margin-bottom: 5px; font-size: 14px; color: #cbd5e1; font-weight: 600; }
     input, select, textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 14px; }
     button { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
     button:hover { background: #1d4ed8; }
-    .btn-add-link { background: #059669; margin-top: 5px; }
-    .btn-add-link:hover { background: #047857; }
-    .btn-cancel { background: #64748b; margin-top: 5px; }
-    .link-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-top: 10px; }
-    .link-card-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #ef4444; cursor: pointer; white-space: nowrap; }
+    
+    /* Episode Box Styling */
+    .ep-box { background: #0f172a; border: 1px solid #38bdf8; border-radius: 10px; padding: 15px; margin-top: 15px; }
+    .ep-header-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .ep-header-row input[type="text"] { flex: 2; font-weight: bold; color: #38bdf8; }
+    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #ef4444; cursor: pointer; white-space: nowrap; font-weight: bold; }
     .checkbox-label input { width: auto; }
+
+    /* Quality Row Styling */
+    .quality-container { background: #1e293b; border-radius: 8px; padding: 10px; margin-top: 10px; }
+    .quality-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .quality-row input { flex: 1; }
+    .btn-remove-q { background: #dc2626; color: #fff; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 12px; width: auto; margin: 0; }
+    
+    .btn-add-q { background: #0284c7; font-size: 12px; padding: 8px 12px; width: auto; margin-top: 5px; }
+    .btn-add-ep { background: #059669; margin-top: 15px; }
+    .btn-add-ep:hover { background: #047857; }
+    .btn-remove-ep { background: #b91c1c; font-size: 12px; padding: 6px 12px; width: auto; margin-top: 10px; }
+    .btn-cancel { background: #64748b; margin-top: 5px; }
+    
     .login-box { max-width: 350px; margin: 100px auto; background: #1e293b; padding: 25px; border-radius: 10px; text-align: center; }
     .hidden { display: none; }
     .movie-list { margin-top: 30px; }
@@ -99,11 +112,11 @@
         <textarea id="synopsis" rows="3" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea>
       </div>
 
-      <!-- ডাউনলোড লিংক ও এপিসোড সেকশন -->
+      <!-- এপিসোড ও কোয়ালিটি লিংক সেকশন -->
       <div class="form-group">
-        <label>ডাউনলোড লিংক ও এপিসোডসমূহ</label>
-        <div id="links-container"></div>
-        <button type="button" class="btn-add-link" onclick="addLinkCard()">+ নতুন এপিসোড / কোয়ালিটি যোগ করুন</button>
+        <label style="font-size: 16px; color: #38bdf8;">এপিসোড ও ডাউনলোড লিংকসমূহ (একত্রে টেমপ্লেট)</label>
+        <div id="episodes-container"></div>
+        <button type="button" class="btn-add-ep" onclick="addEpisodeBox()">+ নতুন এপিসোড বক্স যোগ করুন</button>
       </div>
 
       <button type="submit" id="submit-btn">Publish Content</button>
@@ -151,54 +164,100 @@
       }
     };
 
-    window.addLinkCard = function(labelVal = "", urlVal = "", isNew = false, dateVal = "") {
-      const container = document.getElementById('links-container');
-      const div = document.createElement('div');
-      div.className = 'link-card';
-      
-      const today = "28/09/2026";
-      const uploadDate = dateVal || today;
+    window.addEpisodeBox = function(epName = "", isNew = false, epDate = "", qualities = []) {
+      const container = document.getElementById('episodes-container');
+      const epDiv = document.createElement('div');
+      epDiv.className = 'ep-box';
 
-      div.innerHTML = `
-        <div class="link-card-row">
-          <input type="text" placeholder="এপিসোড (যেমন: Episode: 01 720p)" class="link-label" value="${labelVal}" required>
+      const defaultDate = epDate || "28/09/2026";
+      const defaultName = epName || `Episode: 0${container.children.length + 1}`;
+
+      epDiv.innerHTML = `
+        <div class="ep-header-row">
+          <input type="text" placeholder="এপিসোড নাম (যেমন: Episode: 01)" class="ep-name" value="${defaultName}" required>
           <label class="checkbox-label">
-            <input type="checkbox" class="link-is-new" ${isNew ? 'checked' : ''}> [New] Tag
+            <input type="checkbox" class="ep-is-new" ${isNew ? 'checked' : ''}> [New] Tag
           </label>
         </div>
-        <div class="link-card-row">
-          <input type="text" placeholder="আপলোড তারিখ (যেমন: 28/09/2026)" class="link-date" value="${uploadDate}">
-          <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" value="${urlVal}" required>
+        <div class="ep-header-row">
+          <input type="text" placeholder="আপলোড তারিখ (যেমন: 28/09/2026)" class="ep-date" value="${defaultDate}">
         </div>
+        
+        <div class="quality-container">
+          <label style="font-size:12px; color:#94a3b8; margin-bottom:5px;">ডাউনলোড লিংক ও কোয়ালিটিসমূহ:</label>
+          <div class="qualities-list"></div>
+          <button type="button" class="btn-add-q" onclick="addQualityRow(this)">+ কোয়ালিটি লিংক যোগ করুন</button>
+        </div>
+        
+        <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()">🗑️ এই এপিসোড বক্স মুছুন</button>
       `;
-      container.appendChild(div);
+
+      container.appendChild(epDiv);
+
+      const qList = epDiv.querySelector('.qualities-list');
+      if (qualities && qualities.length > 0) {
+        qualities.forEach(q => addQualityRowDirect(qList, q.label, q.url));
+      } else {
+        addQualityRowDirect(qList, "720p x264 [Size: 242mb]", "");
+        addQualityRowDirect(qList, "1080p x265 [Size: 460mb]", "");
+      }
     };
+
+    window.addQualityRow = function(btn) {
+      const qList = btn.previousElementSibling;
+      addQualityRowDirect(qList, "", "");
+    };
+
+    function addQualityRowDirect(qListElement, labelVal = "", urlVal = "") {
+      const qRow = document.createElement('div');
+      qRow.className = 'quality-row';
+      qRow.innerHTML = `
+        <input type="text" placeholder="কোয়ালিটি/সাইজ (যেমন: 720p 250MB)" class="q-label" value="${labelVal}" required>
+        <input type="url" placeholder="আসল ডাউনলোড লিংক" class="q-url" value="${urlVal}" required>
+        <button type="button" class="btn-remove-q" onclick="this.parentElement.remove()">✕</button>
+      `;
+      qListElement.appendChild(qRow);
+    }
 
     window.resetForm = function() {
       editingId = null;
       document.getElementById('movie-form').reset();
       document.getElementById('submit-btn').innerText = "Publish Content";
       document.getElementById('cancel-edit-btn').classList.add('hidden');
-      document.getElementById('links-container').innerHTML = '';
-      addLinkCard();
+      document.getElementById('episodes-container').innerHTML = '';
+      addEpisodeBox();
     };
 
     document.getElementById('movie-form').addEventListener('submit', function(e) {
       e.preventDefault();
       
-      const labels = document.querySelectorAll('.link-label');
-      const urls = document.querySelectorAll('.link-url');
-      const isNews = document.querySelectorAll('.link-is-new');
-      const dates = document.querySelectorAll('.link-date');
-      const links = [];
+      const epBoxes = document.querySelectorAll('.ep-box');
+      const episodes = [];
 
-      labels.forEach((label, index) => {
-        if(label.value && urls[index].value) {
-          links.push({ 
-            label: label.value, 
-            url: urls[index].value,
-            isNew: isNews[index].checked,
-            date: dates[index].value || "28/09/2026"
+      epBoxes.forEach(box => {
+        const epName = box.querySelector('.ep-name').value;
+        const isNew = box.querySelector('.ep-is-new').checked;
+        const epDate = box.querySelector('.ep-date').value || "28/09/2026";
+        
+        const qLabels = box.querySelectorAll('.q-label');
+        const qUrls = box.querySelectorAll('.q-url');
+        const qualities = [];
+
+        qLabels.forEach((lbl, idx) => {
+          if (lbl.value && qUrls[idx].value) {
+            qualities.push({
+              label: lbl.value,
+              url: qUrls[idx].value
+            });
+          }
+        });
+
+        if (epName && qualities.length > 0) {
+          episodes.push({
+            episodeName: epName,
+            isNew: isNew,
+            date: epDate,
+            qualities: qualities
           });
         }
       });
@@ -212,13 +271,13 @@
         year: document.getElementById('year').value || "2026",
         language: document.getElementById('language').value || "Dual Audio",
         synopsis: document.getElementById('synopsis').value || "",
-        links: links,
+        episodes: episodes,
         timestamp: Date.now()
       };
 
       if (editingId) {
         set(ref(db, 'movies/' + editingId), movieData).then(() => {
-          alert("সফলভাবে আপডেট করা হয়েছে এবং ওপরে নিয়ে যাওয়া হয়েছে!");
+          alert("সফলভাবে আপডেট করা হয়েছে!");
           resetForm();
         });
       } else {
@@ -270,15 +329,17 @@
       document.getElementById('language').value = movie.language || '';
       document.getElementById('synopsis').value = movie.synopsis || '';
 
-      const container = document.getElementById('links-container');
+      const container = document.getElementById('episodes-container');
       container.innerHTML = '';
       
-      if (movie.links && movie.links.length > 0) {
-        movie.links.forEach(link => {
-          addLinkCard(link.label, link.url, link.isNew || false, link.date || "");
+      if (movie.episodes && movie.episodes.length > 0) {
+        movie.episodes.forEach(ep => {
+          addEpisodeBox(ep.episodeName, ep.isNew, ep.date, ep.qualities);
         });
+      } else if (movie.links && movie.links.length > 0) {
+        addEpisodeBox("Episode: 01", false, "28/09/2026", movie.links);
       } else {
-        addLinkCard();
+        addEpisodeBox();
       }
 
       document.getElementById('submit-btn').innerText = "Update Content (Bump to Top)";
@@ -292,7 +353,7 @@
       }
     };
 
-    addLinkCard();
+    addEpisodeBox();
   </script>
 </body>
-    </html>
+  </html>
