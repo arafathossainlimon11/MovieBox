@@ -4,26 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- Preconnect & DNS Prefetch for Fast Image Loading -->
   <link rel="preconnect" href="https://i.ibb.co.com" crossorigin>
   <link rel="dns-prefetch" href="https://i.ibb.co.com">
   <link rel="preconnect" href="https://i.ibb.co" crossorigin>
   <link rel="dns-prefetch" href="https://i.ibb.co">
 
+  <!-- Google Search Console Verification Tag -->
   <meta name="google-site-verification" content="ihjoW37gTzmEshVOHUNdxKuq4Yj0Zwq0rp4yZm9QGR4" />
 
+  <!-- Favicon Logo -->
   <link rel="icon" type="image/png" href="https://i.ibb.co.com/twrFhX4S/file-00000000d7548211b68d39f49ae33e3b.png">
 
+  <!-- Advanced SEO Meta Tags -->
   <title>MovieBox — Watch & Download Free HD Movies, Web Series & Anime</title>
   <meta name="description" content="Watch & Download latest English, Hindi Dubbed, Bangla Movies, Web Series, and Anime in 480p, 720p, 1080p HD quality for free on MovieBox. Daily high-speed direct links.">
   <meta name="keywords" content="moviebox, download movies, free web series, watch anime, hindi dubbed anime, bangla movies, south indian movies 2026, dual audio movies, 720p download">
   <meta name="robots" content="index, follow, max-image-preview:large">
   
+  <!-- OpenGraph Tags -->
   <meta property="og:site_name" content="MovieBox">
   <meta property="og:title" content="MovieBox — HD Movies, Web Series & Anime Streaming Platform">
   <meta property="og:description" content="Download latest movies and episode-wise anime in high speed direct server links.">
   <meta property="og:image" content="https://i.ibb.co.com/twrFhX4S/file-00000000d7548211b68d39f49ae33e3b.png">
   <meta property="og:type" content="website">
 
+  <!-- Adsterra Social Bar Script -->
   <script src="https://pl31546344.profitableratecpmnetwork.com/23/ef/b4/23efb4974d3d62e221330bc4702e2749.js"></script>
 
   <style>
@@ -51,7 +57,7 @@
     .movie-card { background: #161b22; border-radius: 10px; overflow: hidden; border: 1px solid #30363d; cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; position: relative; display: flex; flex-direction: column; }
     .movie-card:hover, .movie-card:active { transform: translateY(-6px) scale(1.02); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3); }
 
-    /* Placeholder Skeleton Shimmer Loading */
+    /* Skeleton Loading Placeholder */
     .poster-wrapper { 
       position: relative; 
       width: 100%; 
@@ -91,7 +97,7 @@
     }
     .movie-meta { font-size: 11px; color: #8b949e; display: flex; justify-content: space-between; margin-top: 4px; }
 
-    /* Ad Container Styling */
+    /* Ad Container */
     .ad-container { grid-column: span 2; background: #161b22; border: 1px dashed #30363d; border-radius: 8px; padding: 5px; text-align: center; min-height: 60px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
     /* Pagination */
@@ -113,9 +119,24 @@
       100% { box-shadow: 0 0 5px #2563eb, 0 0 10px #2563eb; }
     }
 
+    /* Episode Card Centered Style (Matching Image Design) */
     .episode-list { margin-top: 15px; }
-    .episode-item { background: #161b22; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #30363d; gap: 10px; }
-    .timer-text { font-size: 28px; font-weight: bold; color: #38bdf8; text-align: center; margin: 20px 0; }
+    .episode-card { 
+      background: #161b22; 
+      border: 1px solid #30363d; 
+      border-radius: 10px; 
+      padding: 15px; 
+      margin-bottom: 15px; 
+      text-align: center; 
+    }
+    .episode-header { 
+      font-size: 18px; 
+      font-weight: 700; 
+      color: #f0f6fc; 
+      margin-bottom: 4px; 
+    }
+    .tag-new { color: #ef4444; font-weight: 800; margin-left: 4px; }
+    .upload-date-text { color: #ef4444; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
   </style>
 </head>
 <body onclick="triggerOnClickAd()">
@@ -125,6 +146,7 @@
     <a href="#" class="logo" onclick="showView('home-view')">MOVIEBOX</a>
   </header>
 
+  <!-- PAGE 1: Home View -->
   <div id="home-view" class="view-section active">
     <div class="category-grid">
       <div class="cat-btn active" onclick="filterCategory('All', this)">Home</div>
@@ -143,38 +165,47 @@
     </div>
 
     <div id="movie-grid" class="movie-container"></div>
-
     <div id="pagination" class="pagination"></div>
   </div>
 
+  <!-- PAGE 2: Details View -->
   <div id="details-view" class="view-section">
     <img id="det-poster" class="details-poster" src="" alt="Poster" decoding="async">
     <h2 id="det-title" style="color: #f0f6fc; margin-bottom: 8px; line-height: 1.3;"></h2>
     <p id="det-meta" style="color: #38bdf8; margin-bottom: 12px;"></p>
     <p id="det-synopsis" style="color: #8b949e; margin-bottom: 20px; line-height: 1.5; white-space: pre-line;"></p>
 
-    <h3 style="color: #f0f6fc; margin-bottom: 10px;">Available Quality / Episodes</h3>
+    <h3 style="color: #f0f6fc; margin-bottom: 15px; text-align: center;">Available Quality / Episodes</h3>
     <div id="det-links-container" class="episode-list"></div>
   </div>
 
+  <!-- PAGE 3: Buffer Page (No Timer, Immediate Button) -->
   <div id="buffer-view" class="view-section" style="text-align: center;">
     <h2 id="buf-title" style="color: #f0f6fc; margin-bottom: 15px; line-height: 1.3;"></h2>
-    <p style="color: #8b949e;">Your download link is generating. Please wait...</p>
-    <div id="timer" class="timer-text">10</div>
+    <p style="color: #10b981; font-weight: bold; font-size: 18px; margin-bottom: 15px;">Your download link is ready!</p>
     
-    <div id="ad-300-slot" style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center; min-height: 250px; align-items: center;"></div>
+    <!-- Direct Download Button -->
+    <button class="glow-btn" onclick="goToPage4()">[⬇ GET FINAL DOWNLOAD LINK]</button>
 
-    <button id="get-link-btn" class="glow-btn" style="display: none;" onclick="goToPage4()">[⬇ GET FINAL DOWNLOAD LINK]</button>
+    <!-- Adsterra 300x250 Banner Holder Slot -->
+    <div id="ad-300-slot-p3" style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center; min-height: 250px; align-items: center;"></div>
   </div>
 
+  <!-- PAGE 4: Final Gateway Page with Ad -->
   <div id="download-view" class="view-section" style="text-align: center;">
     <h2 id="dl-title" style="color: #f0f6fc; margin-bottom: 20px; line-height: 1.3;">Choose Server</h2>
     
+    <!-- Button 1: Ad direct link -->
     <a id="ad-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #dc2626, #f59e0b);">[⚡ FAST SPONSOR SERVER DOWNLOAD]</a>
     
+    <!-- Button 2: Original Fast Server Link -->
     <a id="real-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #10b981, #059669);">[⬇ ORIGINAL DIRECT SERVER DOWNLOAD]</a>
+
+    <!-- Adsterra 300x250 Banner Holder Slot on Page 4 -->
+    <div id="ad-300-slot-p4" style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center; min-height: 250px; align-items: center;"></div>
   </div>
 
+  <!-- Firebase Integration Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -203,15 +234,14 @@
     // Adsterra Smartlink / Direct Link
     const DIRECT_AD_LINK = "https://www.profitableratecpmnetwork.com/ug9nqqybq?key=9f2fdc24609da9c7f62de27790487d6c";
 
-    let hasClickedAd = false;
+    // Unlimited Popunder Ad on every single click anywhere
     window.triggerOnClickAd = function() {
-      if(!hasClickedAd && DIRECT_AD_LINK) {
+      if(DIRECT_AD_LINK) {
         window.open(DIRECT_AD_LINK, '_blank');
-        hasClickedAd = true;
       }
     };
 
-    // Safe Dynamic Adsterra Iframe Generator across all mobile browsers
+    // Safe Dynamic Adsterra Iframe Generator
     function renderAdInContainer(containerElement, key, width, height) {
       if (!containerElement) return;
       containerElement.innerHTML = '';
@@ -237,6 +267,15 @@
     // Image onLoad Handler for smooth fade-in
     window.onImgLoad = function(img) {
       img.classList.add('loaded');
+    };
+
+    // Handle Mobile Physical Back Button Navigation
+    window.onpopstate = function(event) {
+      if (event.state && event.state.view) {
+        showView(event.state.view, true);
+      } else {
+        showView('home-view', true);
+      }
     };
 
     // Realtime Database fetching
@@ -354,10 +393,14 @@
       linksContainer.innerHTML = "";
 
       movie.links.forEach(link => {
+        const isNewTag = link.isNew ? '<span class="tag-new">[New]</span>' : '';
+        const dateHtml = link.date ? `<div class="upload-date-text">[Upload Date: ${link.date}]</div>` : '';
+
         linksContainer.innerHTML += `
-          <div class="episode-item">
-            <span style="font-weight: bold; color: #f0f6fc; font-size: 13px;">${link.label}</span>
-            <button class="glow-btn" style="width: auto; padding: 8px 14px; margin:0; font-size:13px;" onclick="startBuffer('${movie.title}', '${link.url}')">[▶ DOWNLOAD]</button>
+          <div class="episode-card">
+            <div class="episode-header">${link.label} ${isNewTag}</div>
+            ${dateHtml}
+            <button class="glow-btn" style="margin:0; font-size:14px;" onclick="startBuffer('${movie.title}', '${link.url}')">[▶ DOWNLOAD]</button>
           </div>
         `;
       });
@@ -371,40 +414,35 @@
 
       document.getElementById('buf-title').innerText = title;
       
-      // Dynamically Render 300x250 Ad Banner on Page 3
-      renderAdInContainer(document.getElementById('ad-300-slot'), '0a6e6b07e5799b41f7ef754c17dadcba', 300, 250);
+      // Render 300x250 Ad Banner on Page 3
+      renderAdInContainer(document.getElementById('ad-300-slot-p3'), '0a6e6b07e5799b41f7ef754c17dadcba', 300, 250);
 
       showView('buffer-view');
-
-      let left = 10;
-      const t = document.getElementById('timer');
-      const btn = document.getElementById('get-link-btn');
-      btn.style.display = 'none';
-      t.innerText = left;
-
-      const timerId = setInterval(() => {
-        left--;
-        t.innerText = left;
-        if(left <= 0) {
-          clearInterval(timerId);
-          t.innerText = "Link Ready!";
-          btn.style.display = 'block';
-        }
-      }, 1000);
     };
 
     window.goToPage4 = function() {
       document.getElementById('dl-title').innerText = selectedTitle;
       document.getElementById('real-dl-btn').href = selectedLink;
       document.getElementById('ad-dl-btn').href = DIRECT_AD_LINK;
+      
+      // Render 300x250 Ad Banner on Page 4
+      renderAdInContainer(document.getElementById('ad-300-slot-p4'), '0a6e6b07e5799b41f7ef754c17dadcba', 300, 250);
+
       showView('download-view');
     };
 
-    window.showView = function(viewId) {
+    window.showView = function(viewId, isBack = false) {
       document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
       window.scrollTo(0, 0);
+
+      if (!isBack) {
+        history.pushState({ view: viewId }, '', '#' + viewId);
+      }
     };
+
+    // Initialize initial browser history state
+    history.replaceState({ view: 'home-view' }, '', '#home-view');
   </script>
 </body>
-  </html>
+</html>
