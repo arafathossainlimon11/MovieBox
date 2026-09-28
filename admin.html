@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secret Admin Panel - MovieBox</title>
+  <title>Secret Admin Panel - Anime Download</title>
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
     body { background: #0f172a; color: #f8fafc; padding: 15px; }
@@ -47,7 +47,7 @@
 
   <!-- গোপন লগইন সেকশন -->
   <div id="login-section" class="login-box">
-    <h2>Admin Login</h2>
+    <h2>Anime Admin Login</h2>
     <div class="form-group">
       <input type="password" id="admin-pass" placeholder="পাসওয়ার্ড লিখুন" autocomplete="off">
     </div>
@@ -56,38 +56,39 @@
 
   <!-- মূল এডমিন ড্যাশবোর্ড -->
   <div id="admin-dashboard" class="container hidden">
-    <h2>MovieBox Admin Panel</h2>
+    <h2>Anime Download Admin Panel</h2>
     
     <form id="movie-form">
       <div class="form-group">
         <label>টাইপ (Type)</label>
         <select id="type">
-          <option value="movie">Movie</option>
-          <option value="series">Series / Animation</option>
+          <option value="Anime Series">Anime Series</option>
+          <option value="Anime Movie">Anime Movie</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>মুভি / সিরিজের নাম</label>
-        <input type="text" id="title" placeholder="যেমন: Overgeared Season 01" required>
+        <label>এনিমেশনের নাম (Title)</label>
+        <input type="text" id="title" placeholder="যেমন: Solo Leveling Season 01" required>
       </div>
 
       <div class="form-group">
-        <label>ImgBB পোস্টার ডাইরেক্ট লিংক</label>
+        <label>ImgBB পোস্টার / ব্যানার ডাইরেক্ট লিংক</label>
         <input type="url" id="poster" placeholder="https://i.ibb.co/..." required>
       </div>
 
       <div class="form-group">
-        <label>ক্যাটাগরি</label>
+        <label>ক্যাটাগরি (Genre)</label>
         <select id="category" required>
-          <option value="Hindi">Hindi</option>
-          <option value="English">English</option>
-          <option value="Bangla">Bangla</option>
+          <option value="Hindi Dub">Hindi Dub</option>
+          <option value="English Dub">English Dub</option>
           <option value="Action">Action</option>
           <option value="Romance">Romance</option>
-          <option value="Horror">Horror</option>
-          <option value="Animation">Animation</option>
-          <option value="Series">Series</option>
+          <option value="Adventure">Adventure</option>
+          <option value="Fantasy">Fantasy</option>
+          <option value="Ecchi/18+">Ecchi/18+</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Supernatural">Supernatural</option>
         </select>
       </div>
 
@@ -103,8 +104,13 @@
       </div>
 
       <div class="form-group">
-        <label>ভাষা (Language)</label>
-        <input type="text" id="language" placeholder="Hindi, Tamil, Telugu, English">
+        <label>অডিও ট্র্যাক / ভাষা (Audio Language)</label>
+        <input type="text" id="language" placeholder="Hindi, Japanese, English">
+      </div>
+
+      <div class="form-group">
+        <label>SEO Keywords (Google Search Console-এর জন্য)</label>
+        <textarea id="keywords" rows="2" placeholder="কমা দিয়ে আলাদা করে কিওয়ার্ড লিখুন... যেমন: solo leveling episode 1 hindi, solo leveling download 720p"></textarea>
       </div>
 
       <div class="form-group">
@@ -114,16 +120,16 @@
 
       <!-- এপিসোড ও কোয়ালিটি লিংক সেকশন -->
       <div class="form-group">
-        <label style="font-size: 16px; color: #38bdf8;">এপিসোড ও ডাউনলোড লিংকসমূহ (একত্রে টেমপ্লেট)</label>
+        <label style="font-size: 16px; color: #38bdf8;">এপিসোড ও ডাউনলোড লিংকসমূহ</label>
         <div id="episodes-container"></div>
         <button type="button" class="btn-add-ep" onclick="addEpisodeBox()">+ নতুন এপিসোড বক্স যোগ করুন</button>
       </div>
 
-      <button type="submit" id="submit-btn">Publish Content</button>
+      <button type="submit" id="submit-btn">Publish Anime</button>
       <button type="button" id="cancel-edit-btn" class="btn-cancel hidden" onclick="resetForm()">Cancel Editing</button>
     </form>
 
-    <!-- পোস্ট করা মুভির তালিকা -->
+    <!-- পোস্ট করা এনিমেশনের তালিকা -->
     <div class="movie-list">
       <h3 style="color: #38bdf8; margin-bottom: 10px;">সাম্প্রতিক পোস্টসমূহ</h3>
       <div id="movie-items"></div>
@@ -222,7 +228,7 @@
     window.resetForm = function() {
       editingId = null;
       document.getElementById('movie-form').reset();
-      document.getElementById('submit-btn').innerText = "Publish Content";
+      document.getElementById('submit-btn').innerText = "Publish Anime";
       document.getElementById('cancel-edit-btn').classList.add('hidden');
       document.getElementById('episodes-container').innerHTML = '';
       addEpisodeBox();
@@ -270,6 +276,7 @@
         rating: document.getElementById('rating').value || "N/A",
         year: document.getElementById('year').value || "2026",
         language: document.getElementById('language').value || "Dual Audio",
+        keywords: document.getElementById('keywords').value || "",
         synopsis: document.getElementById('synopsis').value || "",
         episodes: episodes,
         timestamp: Date.now()
@@ -320,13 +327,14 @@
       if (!movie) return;
 
       editingId = id;
-      document.getElementById('type').value = movie.type || 'movie';
+      document.getElementById('type').value = movie.type || 'Anime Series';
       document.getElementById('title').value = movie.title || '';
       document.getElementById('poster').value = movie.poster || '';
-      document.getElementById('category').value = movie.category || 'Hindi';
+      document.getElementById('category').value = movie.category || 'Action';
       document.getElementById('rating').value = movie.rating || '';
       document.getElementById('year').value = movie.year || '';
       document.getElementById('language').value = movie.language || '';
+      document.getElementById('keywords').value = movie.keywords || '';
       document.getElementById('synopsis').value = movie.synopsis || '';
 
       const container = document.getElementById('episodes-container');
@@ -356,4 +364,4 @@
     addEpisodeBox();
   </script>
 </body>
-  </html>
+            </html>
