@@ -37,9 +37,27 @@
     body { background-color: #0d1117; color: #c9d1d9; font-size: 14px; }
     
     /* Header Bar */
-    header { background: #161b22; padding: 12px; text-align: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    header { background: #161b22; padding: 12px; text-align: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+    .header-top { display: flex; align-items: center; gap: 10px; }
     .header-logo-img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
     .logo { color: #58a6ff; font-size: 22px; font-weight: 800; text-decoration: none; letter-spacing: 1px; }
+
+    /* Facebook Group Join Banner */
+    .fb-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1877f2;
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 0 10px rgba(24, 119, 242, 0.4);
+      transition: transform 0.2s;
+    }
+    .fb-banner:active { transform: scale(0.95); }
 
     /* Category Buttons */
     .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; background: #161b22; margin-bottom: 10px; }
@@ -57,7 +75,6 @@
     .movie-card { background: #161b22; border-radius: 10px; overflow: hidden; border: 1px solid #30363d; cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; position: relative; display: flex; flex-direction: column; }
     .movie-card:hover, .movie-card:active { transform: translateY(-6px) scale(1.02); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3); }
 
-    /* Skeleton Loading Placeholder */
     .poster-wrapper { 
       position: relative; 
       width: 100%; 
@@ -97,6 +114,9 @@
     }
     .movie-meta { font-size: 11px; color: #8b949e; display: flex; justify-content: space-between; margin-top: 4px; }
 
+    /* Search Not Found Card */
+    .not-found-card { grid-column: span 2; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 25px 15px; text-align: center; margin-top: 10px; }
+
     /* Ad Container */
     .ad-container { grid-column: span 2; background: #161b22; border: 1px dashed #30363d; border-radius: 8px; padding: 5px; text-align: center; min-height: 60px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
@@ -119,31 +139,48 @@
       100% { box-shadow: 0 0 5px #2563eb, 0 0 10px #2563eb; }
     }
 
-    /* Episode Card Centered Style (Matching Image Design 1000001744.png) */
-    .episode-list { margin-top: 15px; }
+    /* Single Template Episode Box Styling */
     .episode-card { 
       background: #161b22; 
       border: 1px solid #30363d; 
-      border-radius: 10px; 
+      border-radius: 12px; 
       padding: 16px; 
-      margin-bottom: 15px; 
+      margin-bottom: 18px; 
       text-align: center; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .episode-header { 
+    .ep-title-header { 
       font-size: 18px; 
       font-weight: 700; 
       color: #ffffff; 
       margin-bottom: 4px; 
     }
     .tag-new { color: #ef4444; font-weight: 800; margin-left: 4px; }
-    .upload-date-text { color: #ef4444; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+    .upload-date-text { color: #ef4444; font-size: 13px; font-weight: 600; margin-bottom: 15px; }
+
+    .quality-option {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .quality-title { color: #38bdf8; font-weight: bold; margin-bottom: 6px; font-size: 13px; }
   </style>
 </head>
 <body>
 
   <header>
-    <img src="https://i.ibb.co.com/twrFhX4S/file-00000000d7548211b68d39f49ae33e3b.png" alt="Logo" class="header-logo-img">
-    <a href="#" class="logo" onclick="handleNavClick('home-view')">MOVIEBOX</a>
+    <div class="header-top">
+      <img src="https://i.ibb.co.com/twrFhX4S/file-00000000d7548211b68d39f49ae33e3b.png" alt="Logo" class="header-logo-img">
+      <a href="#" class="logo" onclick="showView('home-view')">MOVIEBOX</a>
+    </div>
+
+    <!-- Facebook Group Join Banner Under MOVIEBOX -->
+    <a href="https://facebook.com/groups/1825203915487489/" target="_blank" class="fb-banner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      <span>Join Facebook Group for Requests</span>
+    </a>
   </header>
 
   <!-- PAGE 1: Home View -->
@@ -176,7 +213,7 @@
     <p id="det-synopsis" style="color: #8b949e; margin-bottom: 20px; line-height: 1.5; white-space: pre-line;"></p>
 
     <h3 style="color: #f0f6fc; margin-bottom: 15px; text-align: center;">Available Quality / Episodes</h3>
-    <div id="det-links-container" class="episode-list"></div>
+    <div id="det-links-container"></div>
   </div>
 
   <!-- PAGE 3: Buffer Page -->
@@ -184,7 +221,7 @@
     <h2 id="buf-title" style="color: #f0f6fc; margin-bottom: 15px; line-height: 1.3;"></h2>
     <p style="color: #10b981; font-weight: bold; font-size: 18px; margin-bottom: 15px;">Your download link is ready!</p>
     
-    <button class="glow-btn" onclick="handleDownloadBtnClick()">[⬇ GET FINAL DOWNLOAD LINK]</button>
+    <button class="glow-btn" onclick="handleBufferClick()">[⬇ GET FINAL DOWNLOAD LINK]</button>
 
     <!-- Adsterra 300x250 Banner Holder Slot -->
     <div id="ad-300-slot-p3" style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center; min-height: 250px; align-items: center;"></div>
@@ -194,13 +231,10 @@
   <div id="download-view" class="view-section" style="text-align: center;">
     <h2 id="dl-title" style="color: #f0f6fc; margin-bottom: 20px; line-height: 1.3;">Choose Server</h2>
     
-    <!-- Button 1: Ad direct link -->
-    <a id="ad-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #dc2626, #f59e0b);" onclick="triggerAdOnce()">[⚡ FAST SPONSOR SERVER DOWNLOAD]</a>
+    <a id="ad-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #dc2626, #f59e0b);">[⚡ FAST SPONSOR SERVER DOWNLOAD]</a>
     
-    <!-- Button 2: Original Direct Server Download -->
-    <a id="real-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="handleRealServerClick(event)">[⬇ ORIGINAL DIRECT SERVER DOWNLOAD]</a>
+    <a id="real-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="handleRealDownloadClick()">[⬇ ORIGINAL DIRECT SERVER DOWNLOAD]</a>
 
-    <!-- Adsterra 300x250 Banner Holder Slot on Page 4 -->
     <div id="ad-300-slot-p4" style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center; min-height: 250px; align-items: center;"></div>
   </div>
 
@@ -230,51 +264,33 @@
     let selectedLink = "";
     let selectedTitle = "";
 
-    // Adsterra Smartlink / Direct Link
+    // Adsterra Direct Smartlink
     const DIRECT_AD_LINK = "https://www.profitableratecpmnetwork.com/ug9nqqybq?key=9f2fdc24609da9c7f62de27790487d6c";
 
-    let adTriggeredForAction = false;
-
-    // Trigger Ad once, then allow work on 2nd tap
-    window.triggerAdOnce = function() {
+    // Ad Trigger Helper
+    function popAd() {
       if (DIRECT_AD_LINK) {
         window.open(DIRECT_AD_LINK, '_blank');
       }
-    };
+    }
 
     window.handleCardClick = function(id) {
-      if (!adTriggeredForAction) {
-        adTriggeredForAction = true;
-        window.triggerAdOnce();
-      } else {
-        adTriggeredForAction = false;
-        openDetails(id);
-      }
+      popAd();
+      openDetails(id);
     };
 
-    window.handleNavClick = function(viewId) {
-      showView(viewId);
+    window.triggerDownloadAction = function(title, url) {
+      popAd();
+      startBuffer(title, url);
     };
 
-    window.handleDownloadBtnClick = function() {
-      if (!adTriggeredForAction) {
-        adTriggeredForAction = true;
-        window.triggerAdOnce();
-      } else {
-        adTriggeredForAction = false;
-        goToPage4();
-      }
+    window.handleBufferClick = function() {
+      popAd();
+      goToPage4();
     };
 
-    window.handleRealServerClick = function(e) {
-      if (!adTriggeredForAction) {
-        e.preventDefault();
-        adTriggeredForAction = true;
-        window.triggerAdOnce();
-      } else {
-        adTriggeredForAction = false;
-        // Allows direct navigation to real download URL
-      }
+    window.handleRealDownloadClick = function() {
+      popAd();
     };
 
     // Safe Dynamic Adsterra Iframe Generator
@@ -321,7 +337,6 @@
       });
 
       allMovies.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-      
       filteredMovies = [...allMovies];
       renderGrid();
     });
@@ -340,7 +355,7 @@
     };
 
     window.handleSearch = function() {
-      const q = document.getElementById('search-input').value.toLowerCase();
+      const q = document.getElementById('search-input').value.toLowerCase().trim();
       filteredMovies = allMovies.filter(m => m.title.toLowerCase().includes(q));
       currentPage = 1;
       renderGrid();
@@ -349,6 +364,25 @@
     function renderGrid() {
       const grid = document.getElementById('movie-grid');
       grid.innerHTML = "";
+
+      if (filteredMovies.length === 0) {
+        grid.innerHTML = `
+          <div class="not-found-card">
+            <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
+            <h3 style="color: #f0f6fc; font-size: 16px; margin-bottom: 6px;">কাঙ্খিত মুভি বা সিরিজটি খুঁজে পাওয়া যায়নি? / Movie Not Found?</h3>
+            <p style="color: #8b949e; font-size: 13px; line-height: 1.5; margin-bottom: 16px;">
+              আপনার পছন্দের মুভি বা সিরিজটি না পেয়ে থাকলে আমাদের ফেসবুক গ্রুপে জয়েন করে রিকোয়েস্ট করুন! আমরা দ্রুত আপলোড করে দেব।<br>
+              <span style="color: #58a6ff;">If you can't find your requested movie, join our Facebook group & request it. We will upload it soon!</span>
+            </p>
+            <a href="https://facebook.com/groups/1825203915487489/" target="_blank" class="fb-banner" style="font-size: 13px; padding: 10px 18px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              Join Facebook Group & Request
+            </a>
+          </div>
+        `;
+        document.getElementById('pagination').innerHTML = "";
+        return;
+      }
 
       const start = (currentPage - 1) * itemsPerPage;
       const end = start + itemsPerPage;
@@ -422,26 +456,58 @@
       document.getElementById('det-meta').innerText = `⭐ ${movie.rating} | ${movie.year} | ${movie.language} | ${movie.category}`;
       document.getElementById('det-synopsis').innerText = movie.synopsis || "No synopsis available.";
 
-      const linksContainer = document.getElementById('det-links-container');
-      linksContainer.innerHTML = "";
+      const container = document.getElementById('det-links-container');
+      container.innerHTML = "";
 
-      movie.links.forEach(link => {
-        const isNewTag = link.isNew ? '<span class="tag-new">[New]</span>' : '';
-        const dateHtml = `<div class="upload-date-text">[Upload Date: ${link.date || '28/09/2026'}]</div>`;
+      // Single Template Episode Box Rendering
+      if (movie.episodes && movie.episodes.length > 0) {
+        movie.episodes.forEach(ep => {
+          const isNewTag = ep.isNew ? '<span class="tag-new">[New]</span>' : '';
+          const dateText = `<div class="upload-date-text">[Upload Date: ${ep.date || '28/09/2026'}]</div>`;
 
-        linksContainer.innerHTML += `
+          let qualitiesHtml = '';
+          ep.qualities.forEach(q => {
+            qualitiesHtml += `
+              <div class="quality-option">
+                <div class="quality-title">${q.label}</div>
+                <button class="glow-btn" style="margin:0; font-size:13px; padding:10px;" onclick="triggerDownloadAction('${movie.title} - ${ep.episodeName}', '${q.url}')">[▶ DOWNLOAD]</button>
+              </div>
+            `;
+          });
+
+          container.innerHTML += `
+            <div class="episode-card">
+              <div class="ep-title-header">${ep.episodeName} ${isNewTag}</div>
+              ${dateText}
+              ${qualitiesHtml}
+            </div>
+          `;
+        });
+      } else if (movie.links && movie.links.length > 0) {
+        // Legacy Links grouping fallback
+        let qualitiesHtml = '';
+        movie.links.forEach(link => {
+          qualitiesHtml += `
+            <div class="quality-option">
+              <div class="quality-title">${link.label}</div>
+              <button class="glow-btn" style="margin:0; font-size:13px; padding:10px;" onclick="triggerDownloadAction('${movie.title}', '${link.url}')">[▶ DOWNLOAD]</button>
+            </div>
+          `;
+        });
+
+        container.innerHTML += `
           <div class="episode-card">
-            <div class="episode-header">${link.label} ${isNewTag}</div>
-            ${dateHtml}
-            <button class="glow-btn" style="margin:0; font-size:14px;" onclick="startBuffer('${movie.title}', '${link.url}')">[▶ DOWNLOAD]</button>
+            <div class="ep-title-header">Download Links</div>
+            <div class="upload-date-text">[Upload Date: 28/09/2026]</div>
+            ${qualitiesHtml}
           </div>
         `;
-      });
+      }
 
       showView('details-view');
     }
 
-    window.startBuffer = function(title, url) {
+    function startBuffer(title, url) {
       selectedTitle = title;
       selectedLink = url;
 
@@ -449,7 +515,7 @@
       renderAdInContainer(document.getElementById('ad-300-slot-p3'), '0a6e6b07e5799b41f7ef754c17dadcba', 300, 250);
 
       showView('buffer-view');
-    };
+    }
 
     function goToPage4() {
       document.getElementById('dl-title').innerText = selectedTitle;
@@ -471,6 +537,7 @@
       }
     }
 
+    window.showView = showView;
     history.replaceState({ view: 'home-view' }, '', '#home-view');
   </script>
 </body>
