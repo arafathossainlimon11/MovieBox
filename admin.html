@@ -15,6 +15,32 @@
     button { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
     button:hover { background: #1d4ed8; }
     
+    /* Multiple Category Checkbox Grid */
+    .category-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      background: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+    }
+    .cat-check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .cat-check-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #0284c7;
+      cursor: pointer;
+    }
+
     /* Episode Box Styling */
     .ep-box { background: #0f172a; border: 1px solid #38bdf8; border-radius: 10px; padding: 15px; margin-top: 15px; }
     .ep-header-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
@@ -77,19 +103,21 @@
         <input type="url" id="poster" placeholder="https://i.ibb.co/..." required>
       </div>
 
+      <!-- একাধিক ক্যাটাগরি সিলেক্ট করার জন্য চেকবাক্স সেকশন -->
       <div class="form-group">
-        <label>ক্যাটাগরি (Genre)</label>
-        <select id="category" required>
-          <option value="Hindi Dub">Hindi Dub</option>
-          <option value="English Dub">English Dub</option>
-          <option value="Action">Action</option>
-          <option value="Romance">Romance</option>
-          <option value="Adventure">Adventure</option>
-          <option value="Fantasy">Fantasy</option>
-          <option value="Ecchi/18+">Ecchi/18+</option>
-          <option value="Sci-Fi">Sci-Fi</option>
-          <option value="Supernatural">Supernatural</option>
-        </select>
+        <label>ক্যাটাগরি / Genre (একাধিক সিলেক্ট করুন):</label>
+        <div class="category-checkbox-grid">
+          <label class="cat-check-item"><input type="checkbox" value="Hindi Dub" class="cat-checkbox"> Hindi Dub</label>
+          <label class="cat-check-item"><input type="checkbox" value="English Dub" class="cat-checkbox"> English Dub</label>
+          <label class="cat-check-item"><input type="checkbox" value="Action" class="cat-checkbox"> Action</label>
+          <label class="cat-check-item"><input type="checkbox" value="Romance" class="cat-checkbox"> Romance</label>
+          <label class="cat-check-item"><input type="checkbox" value="Adventure" class="cat-checkbox"> Adventure</label>
+          <label class="cat-check-item"><input type="checkbox" value="Fantasy" class="cat-checkbox"> Fantasy</label>
+          <label class="cat-check-item"><input type="checkbox" value="Ecchi/18+" class="cat-checkbox"> Ecchi/18+</label>
+          <label class="cat-check-item"><input type="checkbox" value="Sci-Fi" class="cat-checkbox"> Sci-Fi</label>
+          <label class="cat-check-item"><input type="checkbox" value="Supernatural" class="cat-checkbox"> Supernatural</label>
+          <label class="cat-check-item"><input type="checkbox" value="Drama" class="cat-checkbox"> Drama</label>
+        </div>
       </div>
 
       <div style="display: flex; gap: 10px;">
@@ -228,6 +256,7 @@
     window.resetForm = function() {
       editingId = null;
       document.getElementById('movie-form').reset();
+      document.querySelectorAll('.cat-checkbox').forEach(cb => cb.checked = false);
       document.getElementById('submit-btn').innerText = "Publish Anime";
       document.getElementById('cancel-edit-btn').classList.add('hidden');
       document.getElementById('episodes-container').innerHTML = '';
@@ -237,6 +266,17 @@
     document.getElementById('movie-form').addEventListener('submit', function(e) {
       e.preventDefault();
       
+      // Get selected multiple categories
+      const selectedCategories = [];
+      document.querySelectorAll('.cat-checkbox:checked').forEach(cb => {
+        selectedCategories.push(cb.value);
+      });
+
+      if (selectedCategories.length === 0) {
+        alert("অনুগহ করে কমপক্ষে একটি ক্যাটাগরি সিলেক্ট করুন!");
+        return;
+      }
+
       const epBoxes = document.querySelectorAll('.ep-box');
       const episodes = [];
 
@@ -272,7 +312,7 @@
         type: document.getElementById('type').value,
         title: document.getElementById('title').value,
         poster: document.getElementById('poster').value,
-        category: document.getElementById('category').value,
+        category: selectedCategories,
         rating: document.getElementById('rating').value || "N/A",
         year: document.getElementById('year').value || "2026",
         language: document.getElementById('language').value || "Dual Audio",
@@ -307,10 +347,12 @@
           const id = child.key;
           moviesCache[id] = movie;
 
+          const catDisplay = Array.isArray(movie.category) ? movie.category.join(', ') : (movie.category || '');
+
           itemsDiv.innerHTML += `
             <div class="movie-item">
               <div>
-                <strong>${movie.title}</strong> (${movie.category})
+                <strong>${movie.title}</strong> <br><small style="color:#38bdf8;">[${catDisplay}]</small>
               </div>
               <div class="action-btns">
                 <button class="btn-edit" onclick="editMovie('${id}')">Edit</button>
@@ -330,7 +372,18 @@
       document.getElementById('type').value = movie.type || 'Anime Series';
       document.getElementById('title').value = movie.title || '';
       document.getElementById('poster').value = movie.poster || '';
-      document.getElementById('category').value = movie.category || 'Action';
+      
+      // Select checked categories
+      document.querySelectorAll('.cat-checkbox').forEach(cb => cb.checked = false);
+      if (movie.category) {
+        let cats = Array.isArray(movie.category) ? movie.category : movie.category.split(',').map(s => s.trim());
+        document.querySelectorAll('.cat-checkbox').forEach(cb => {
+          if (cats.includes(cb.value)) {
+            cb.checked = true;
+          }
+        });
+      }
+
       document.getElementById('rating').value = movie.rating || '';
       document.getElementById('year').value = movie.year || '';
       document.getElementById('language').value = movie.language || '';
