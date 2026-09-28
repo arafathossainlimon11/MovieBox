@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO & Search Engine Optimization Meta Tags -->
+  <title>MovieBox — Watch & Download Free HD Movies, Web Series & Anime</title>
+  <meta name="description" content="Watch and download latest English, Hindi, Bangla Movies, Web Series, and Anime in 480p, 720p, 1080p HD quality for free on MovieBox.">
+  <meta name="keywords" content="moviebox, download movies, free web series, watch anime, hindi dubbed movies, bangla movies 2026">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="MovieBox — HD Movies & Anime Streaming Platform">
+  <meta property="og:description" content="Download latest movies and episode-wise anime in high speed server links.">
+  <meta property="og:type" content="website">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0d1117; color: #c9d1d9; font-size: 14px; }
+    
+    /* Header & Top Categories Bar */
+    header { background: #161b22; padding: 12px; text-align: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 1000; }
+    .logo { color: #58a6ff; font-size: 24px; font-weight: 800; text-decoration: none; letter-spacing: 1px; }
+
+    .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; background: #161b22; margin-bottom: 10px; }
+    .cat-btn { background: #e11d48; color: #fff; text-align: center; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 12px; text-decoration: none; cursor: pointer; transition: 0.2s; }
+    .cat-btn:active, .cat-btn.active { background: #be123c; transform: scale(0.96); }
+
+    /* Search Bar */
+    .search-box { padding: 0 12px 12px 12px; }
+    .search-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #21262d; color: #fff; font-size: 14px; outline: none; }
+    .search-input:focus { border-color: #58a6ff; }
+
+    /* 2-Column Movie Grid Layout */
+    .movie-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
+    
+    /* Bounce & Hover Animation on Movie Card */
+    .movie-card { background: #161b22; border-radius: 10px; overflow: hidden; border: 1px solid #30363d; cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; position: relative; }
+    .movie-card:hover, .movie-card:active { transform: translateY(-8px) scale(1.02); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3); }
+
+    .poster-wrapper { position: relative; width: 100%; aspect-ratio: 2/3; overflow: hidden; background: #21262d; }
+    .poster-img { width: 100%; height: 100%; object-fit: cover; }
+    .badge { position: absolute; top: 6px; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #fff; }
+    .badge-rating { left: 6px; background: #d97706; }
+    .badge-quality { right: 6px; background: #2563eb; }
+
+    .movie-info { padding: 10px; }
+    .movie-title { font-size: 13px; font-weight: bold; color: #f0f6fc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .movie-meta { font-size: 11px; color: #8b949e; display: flex; justify-content: space-between; }
+
+    /* 320x50 Ad Slot Styling */
+    .ad-container { grid-column: span 2; background: #161b22; border: 1px dashed #30363d; border-radius: 8px; padding: 8px; text-align: center; min-height: 55px; display: flex; align-items: center; justify-content: center; }
+
+    /* Pagination */
+    .pagination { display: flex; justify-content: center; gap: 6px; padding: 20px 12px; }
+    .page-btn { padding: 8px 14px; background: #21262d; color: #c9d1d9; border-radius: 6px; cursor: pointer; border: 1px solid #30363d; }
+    .page-btn.active { background: #2563eb; color: #fff; font-weight: bold; }
+
+    /* Details View & 4-Page Funnel Layouts */
+    .view-section { padding: 15px; max-width: 600px; margin: auto; display: none; }
+    .view-section.active { display: block; }
+    .details-poster { width: 100%; max-height: 350px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
+
+    /* Google One Style Glowing Pulse Animation Button */
+    .glow-btn { width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; color: #fff; background: linear-gradient(135deg, #2563eb, #06b6d4); cursor: pointer; text-align: center; text-decoration: none; display: block; font-size: 15px; animation: pulseGlow 2s infinite; }
+    
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 5px #2563eb, 0 0 10px #2563eb; }
+      50% { box-shadow: 0 0 20px #06b6d4, 0 0 30px #06b6d4; }
+      100% { box-shadow: 0 0 5px #2563eb, 0 0 10px #2563eb; }
+    }
+
+    .episode-list { margin-top: 15px; }
+    .episode-item { background: #161b22; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #30363d; }
+    .timer-text { font-size: 24px; font-weight: bold; color: #38bdf8; text-align: center; margin: 20px 0; }
+  </style>
+</head>
+<body onclick="triggerOnClickAd()">
+
+  <header>
+    <a href="#" class="logo" onclick="showView('home-view')">MOVIEBOX</a>
+  </header>
+
+  <!-- Sticky Top Notification / Message Ad Slot -->
+  <div id="sticky-top-ad" style="text-align: center; background: #161b22;">
+    <!-- Adsterra Social Bar Code Here -->
+  </div>
+
+  <!-- PAGE 1: Home View -->
+  <div id="home-view" class="view-section active">
+    <!-- Categories Navigation Grid -->
+    <div class="category-grid">
+      <div class="cat-btn active" onclick="filterCategory('All', this)">Home</div>
+      <div class="cat-btn" onclick="filterCategory('Hindi', this)">Hindi</div>
+      <div class="cat-btn" onclick="filterCategory('English', this)">English</div>
+      <div class="cat-btn" onclick="filterCategory('Bangla', this)">Bangla</div>
+      <div class="cat-btn" onclick="filterCategory('Action', this)">Action</div>
+      <div class="cat-btn" onclick="filterCategory('Romance', this)">Romance</div>
+      <div class="cat-btn" onclick="filterCategory('Horror', this)">Horror</div>
+      <div class="cat-btn" onclick="filterCategory('Animation', this)">Animation</div>
+      <div class="cat-btn" onclick="filterCategory('Series', this)">Series</div>
+    </div>
+
+    <!-- Live Search Bar -->
+    <div class="search-box">
+      <input type="text" id="search-input" class="search-input" placeholder="Movie বা Series-এর English নাম লিখুন..." oninput="handleSearch()">
+    </div>
+
+    <!-- 2-Column Movie List -->
+    <div id="movie-grid" class="movie-container"></div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="pagination"></div>
+  </div>
+
+  <!-- PAGE 2: Details View -->
+  <div id="details-view" class="view-section">
+    <img id="det-poster" class="details-poster" src="" alt="Poster">
+    <h2 id="det-title" style="color: #f0f6fc; margin-bottom: 8px;"></h2>
+    <p id="det-meta" style="color: #38bdf8; margin-bottom: 12px;"></p>
+    <p id="det-synopsis" style="color: #8b949e; margin-bottom: 20px; line-height: 1.5;"></p>
+
+    <h3 style="color: #f0f6fc; margin-bottom: 10px;">Available Quality / Episodes</h3>
+    <div id="det-links-container" class="episode-list"></div>
+  </div>
+
+  <!-- PAGE 3: Buffer / Timer Page -->
+  <div id="buffer-view" class="view-section" style="text-align: center;">
+    <h2 id="buf-title" style="color: #f0f6fc; margin-bottom: 15px;"></h2>
+    <p style="color: #8b949e;">Your download link is generating. Please wait...</p>
+    <div id="timer" class="timer-text">10</div>
+    
+    <!-- Banner Ad inside Buffer Page -->
+    <div style="margin: 20px 0; background: #161b22; padding: 15px; border-radius: 8px;">
+      <!-- Adsterra 300x250 Banner Code -->
+    </div>
+
+    <button id="get-link-btn" class="glow-btn" style="display: none;" onclick="goToPage4()">[⬇ GET FINAL DOWNLOAD LINK]</button>
+  </div>
+
+  <!-- PAGE 4: Final Gateway Page -->
+  <div id="download-view" class="view-section" style="text-align: center;">
+    <h2 id="dl-title" style="color: #f0f6fc; margin-bottom: 20px;">Choose Server</h2>
+    
+    <!-- Button 1: Ad direct link -->
+    <a id="ad-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #dc2626, #f59e0b);">[⚡ FAST SPONSOR SERVER DOWNLOAD]</a>
+    
+    <!-- Button 2: Original Fast Server Link -->
+    <a id="real-dl-btn" href="#" target="_blank" class="glow-btn" style="background: linear-gradient(135deg, #10b981, #059669);">[⬇ ORIGINAL DIRECT SERVER DOWNLOAD]</a>
+  </div>
+
+  <!-- Firebase Integration Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBZPX85Wl0-vBE7Vm1NBuVoiBzVmp9xU0o",
+      authDomain: "moviebox-6dca4.firebaseapp.com",
+      databaseURL: "https://moviebox-6dca4-default-rtdb.firebaseio.com",
+      projectId: "moviebox-6dca4",
+      storageBucket: "moviebox-6dca4.firebasestorage.app",
+      messagingSenderId: "573703773546",
+      appId: "1:573703773546:web:04f01416cba5ff483ad913",
+      measurementId: "G-1KR5NJ9T61"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let allMovies = [];
+    let filteredMovies = [];
+    let currentPage = 1;
+    const itemsPerPage = 20;
+    let selectedLink = "";
+    let selectedTitle = "";
+
+    // Direct Ad Link (Adsterra/Monetag)
+    const DIRECT_AD_LINK = "https://www.google.com"; // এখানে আপনার Adsterra Direct Link বসাবেন
+
+    // Unlimited On-Click Popup Script
+    window.triggerOnClickAd = function() {
+      if(DIRECT_AD_LINK) {
+        window.open(DIRECT_AD_LINK, '_blank');
+      }
+    };
+
+    // Realtime Database fetching with Automatic Sorting by Latest Update
+    onValue(ref(db, 'movies'), (snapshot) => {
+      allMovies = [];
+      snapshot.forEach((child) => {
+        allMovies.push({ id: child.key, ...child.val() });
+      });
+
+      // Sort Movies: Latest updated/posted content stays at the top
+      allMovies.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      
+      filteredMovies = [...allMovies];
+      renderGrid();
+    });
+
+    window.filterCategory = function(cat, el) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      
+      if(cat === 'All') {
+        filteredMovies = [...allMovies];
+      } else {
+        filteredMovies = allMovies.filter(m => m.category === cat);
+      }
+      currentPage = 1;
+      renderGrid();
+    };
+
+    window.handleSearch = function() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      filteredMovies = allMovies.filter(m => m.title.toLowerCase().includes(q));
+      currentPage = 1;
+      renderGrid();
+    };
+
+    function renderGrid() {
+      const grid = document.getElementById('movie-grid');
+      grid.innerHTML = "";
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageItems = filteredMovies.slice(start, end);
+
+      pageItems.forEach((movie, index) => {
+        // Dynamic Movie Card
+        grid.innerHTML += `
+          <div class="movie-card" onclick="openDetails('${movie.id}')">
+            <div class="poster-wrapper">
+              <img class="poster-img" src="${movie.poster}" alt="${movie.title}" loading="lazy">
+              <span class="badge badge-rating">${movie.rating}</span>
+              <span class="badge badge-quality">${movie.year}</span>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">${movie.title}</div>
+              <div class="movie-meta">
+                <span>${movie.language}</span>
+                <span>${movie.category}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Insert 320x50 Ad banner slot after every 2 movie items
+        if ((index + 1) % 2 === 0) {
+          grid.innerHTML += `
+            <div class="ad-container">
+              <span style="font-size:10px; color:#8b949e;">ADVERTISEMENT (320x50)</span>
+            </div>
+          `;
+        }
+      });
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredMovies.length / itemsPerPage);
+      const container = document.getElementById('pagination');
+      container.innerHTML = "";
+
+      for(let i=1; i<=totalPages; i++) {
+        container.innerHTML += `
+          <div class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</div>
+        `;
+      }
+    }
+
+    window.goToPage = function(p) {
+      currentPage = p;
+      renderGrid();
+      window.scrollTo(0, 0);
+    };
+
+    window.openDetails = function(id) {
+      const movie = allMovies.find(m => m.id === id);
+      if(!movie) return;
+
+      document.getElementById('det-poster').src = movie.poster;
+      document.getElementById('det-title').innerText = movie.title;
+      document.getElementById('det-meta').innerText = `⭐ ${movie.rating} | ${movie.year} | ${movie.language} | ${movie.category}`;
+      document.getElementById('det-synopsis').innerText = movie.synopsis || "No synopsis available.";
+
+      const linksContainer = document.getElementById('det-links-container');
+      linksContainer.innerHTML = "";
+
+      movie.links.forEach(link => {
+        linksContainer.innerHTML += `
+          <div class="episode-item">
+            <span style="font-weight: bold; color: #f0f6fc;">${link.label}</span>
+            <button class="glow-btn" style="width: auto; padding: 8px 16px; margin:0;" onclick="startBuffer('${movie.title}', '${link.url}')">[▶ WATCH / DOWNLOAD]</button>
+          </div>
+        `;
+      });
+
+      showView('details-view');
+    };
+
+    window.startBuffer = function(title, url) {
+      selectedTitle = title;
+      selectedLink = url;
+
+      document.getElementById('buf-title').innerText = title;
+      showView('buffer-view');
+
+      let left = 10;
+      const t = document.getElementById('timer');
+      const btn = document.getElementById('get-link-btn');
+      btn.style.display = 'none';
+      t.innerText = left;
+
+      const timerId = setInterval(() => {
+        left--;
+        t.innerText = left;
+        if(left <= 0) {
+          clearInterval(timerId);
+          t.innerText = "Link Ready!";
+          btn.style.display = 'block';
+        }
+      }, 1000);
+    };
+
+    window.goToPage4 = function() {
+      document.getElementById('dl-title').innerText = selectedTitle;
+      document.getElementById('real-dl-btn').href = selectedLink;
+      document.getElementById('ad-dl-btn').href = DIRECT_AD_LINK;
+      showView('download-view');
+    };
+
+    window.showView = function(viewId) {
+      document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      window.scrollTo(0, 0);
+    };
+  </script>
+</body>
+      </html>
