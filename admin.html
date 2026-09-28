@@ -3,61 +3,296 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MovieBox Admin Panel</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Secret Admin Panel - MovieBox</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
+    body { background: #0f172a; color: #f8fafc; padding: 15px; }
+    .container { max-width: 600px; margin: auto; background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h2 { text-align: center; margin-bottom: 20px; color: #38bdf8; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-size: 14px; color: #cbd5e1; }
+    input, select, textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 14px; }
+    button { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+    button:hover { background: #1d4ed8; }
+    .btn-add-link { background: #059669; margin-top: 5px; }
+    .btn-add-link:hover { background: #047857; }
+    .btn-cancel { background: #64748b; margin-top: 5px; }
+    .link-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-top: 10px; }
+    .link-card-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #ef4444; cursor: pointer; white-space: nowrap; }
+    .checkbox-label input { width: auto; }
+    .login-box { max-width: 350px; margin: 100px auto; background: #1e293b; padding: 25px; border-radius: 10px; text-align: center; }
+    .hidden { display: none; }
+    .movie-list { margin-top: 30px; }
+    .movie-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; margin-top: 8px; border-radius: 6px; border: 1px solid #334155; }
+    .action-btns { display: flex; gap: 6px; }
+    .btn-edit { background: #d97706; padding: 6px 12px; font-size: 12px; width: auto; margin: 0; }
+    .btn-delete { background: #dc2626; padding: 6px 12px; font-size: 12px; width: auto; margin: 0; }
+  </style>
 </head>
 <body>
 
-  <header class="navbar">
-    <div class="logo">MOVIEBOX ADMIN PANEL</div>
-  </header>
+  <!-- গোপন লগইন সেকশন -->
+  <div id="login-section" class="login-box">
+    <h2>Admin Login</h2>
+    <div class="form-group">
+      <input type="password" id="admin-pass" placeholder="পাসওয়ার্ড লিখুন" autocomplete="off">
+    </div>
+    <button onclick="login()">Login</button>
+  </div>
 
-  <main class="container admin-container">
-    <h2>নতুন মুভি / এনিম যুক্ত করুন</h2>
-    <form id="addMovieForm">
-      
+  <!-- মূল এডমিন ড্যাশবোর্ড -->
+  <div id="admin-dashboard" class="container hidden">
+    <h2>MovieBox Admin Panel</h2>
+    
+    <form id="movie-form">
       <div class="form-group">
-        <label>টাইটেল (Title):</label>
-        <input type="text" id="movieTitle" placeholder="Overgeared Season 01 Hindi, Tamil..." required>
-      </div>
-
-      <div class="form-group">
-        <label>ক্যাটাগরি (Category):</label>
-        <select id="movieCategory" style="width: 100%; padding: 10px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px;">
-          <option value="Animation">Animation</option>
-          <option value="Action">Action</option>
-          <option value="Hindi">Hindi</option>
-          <option value="English">English</option>
-          <option value="Bangla">Bangla</option>
-          <option value="Series">Series</option>
-          <option value="Romance">Romance</option>
-          <option value="Horror">Horror</option>
+        <label>টাইপ (Type)</label>
+        <select id="type">
+          <option value="movie">Movie</option>
+          <option value="series">Series / Animation</option>
         </select>
       </div>
 
-      <!-- 🔒 গোপন SEO কিওয়ার্ড ফিল্ড -->
-      <div class="form-group seo-box">
-        <label style="color: #38bdf8;">🔒 SEO Keywords (গোপন কিওয়ার্ড - গুগল সার্চ কনসোলের জন্য):</label>
-        <p class="seo-help">* এই কিওয়ার্ডগুলো ইউজারদের ওয়েবসাইটে দেখাবে না। কিন্তু গুগল সার্চ কনসোল ও ইনডেক্সিংয়ে মুভিটি সহজে খুঁজে পাওয়ার জন্য কাজ করবে। (কমা দিয়ে লিখুন)</p>
-        <textarea id="seoKeywords" rows="3" placeholder="overgeared season 1 bangla, overgeared episode 1 1080p download, anime bangla dub, crunchyroll anime..."></textarea>
+      <div class="form-group">
+        <label>মুভি / সিরিজের নাম</label>
+        <input type="text" id="title" placeholder="যেমন: Overgeared Season 01" required>
       </div>
 
-      <h3>এপিসোড ও ডাউনলোডের লিংকসমূহ:</h3>
-      <div id="episodesContainer">
-        <!-- জাভাস্ক্রিপ্ট দিয়ে এপিসোড ফিল্ড তৈরি হবে -->
+      <div class="form-group">
+        <label>ImgBB পোস্টার ডাইরেক্ট লিংক</label>
+        <input type="url" id="poster" placeholder="https://i.ibb.co/..." required>
       </div>
 
-      <button type="button" class="btn-add" id="addEpBtn">+ নতুন এপিসোড যুক্ত করুন</button>
+      <div class="form-group">
+        <label>ক্যাটাগরি</label>
+        <select id="category" required>
+          <option value="Hindi">Hindi</option>
+          <option value="English">English</option>
+          <option value="Bangla">Bangla</option>
+          <option value="Action">Action</option>
+          <option value="Romance">Romance</option>
+          <option value="Horror">Horror</option>
+          <option value="Animation">Animation</option>
+          <option value="Series">Series</option>
+        </select>
+      </div>
 
-      <br><br>
-      <button type="submit" class="btn-submit">ওয়েবসাইটে সেভ ও পাবলিশ করুন (Publish Movie)</button>
+      <div style="display: flex; gap: 10px;">
+        <div class="form-group" style="flex: 1;">
+          <label>রেটিং (Rating)</label>
+          <input type="text" id="rating" placeholder="⭐ 9.5">
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label>রিলিজ বছর (Year)</label>
+          <input type="text" id="year" placeholder="2026">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ভাষা (Language)</label>
+        <input type="text" id="language" placeholder="Hindi, Tamil, Telugu, English">
+      </div>
+
+      <div class="form-group">
+        <label>গল্প / বিবরণ (Synopsis)</label>
+        <textarea id="synopsis" rows="3" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea>
+      </div>
+
+      <!-- ডাউনলোড লিংক ও এপিসোড সেকশন -->
+      <div class="form-group">
+        <label>ডাউনলোড লিংক ও এপিসোডসমূহ</label>
+        <div id="links-container"></div>
+        <button type="button" class="btn-add-link" onclick="addLinkCard()">+ নতুন এপিসোড / কোয়ালিটি যোগ করুন</button>
+      </div>
+
+      <button type="submit" id="submit-btn">Publish Content</button>
+      <button type="button" id="cancel-edit-btn" class="btn-cancel hidden" onclick="resetForm()">Cancel Editing</button>
     </form>
 
-    <hr class="divider">
-    <h3>বর্তমান যুক্ত থাকা মুভিসমূহ:</h3>
-    <div id="adminMovieList"></div>
-  </main>
+    <!-- পোস্ট করা মুভির তালিকা -->
+    <div class="movie-list">
+      <h3 style="color: #38bdf8; margin-bottom: 10px;">সাম্প্রতিক পোস্টসমূহ</h3>
+      <div id="movie-items"></div>
+    </div>
+  </div>
 
-  <script src="script.js"></script>
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBZPX85Wl0-vBE7Vm1NBuVoiBzVmp9xU0o",
+      authDomain: "moviebox-6dca4.firebaseapp.com",
+      databaseURL: "https://moviebox-6dca4-default-rtdb.firebaseio.com",
+      projectId: "moviebox-6dca4",
+      storageBucket: "moviebox-6dca4.firebasestorage.app",
+      messagingSenderId: "573703773546",
+      appId: "1:573703773546:web:04f01416cba5ff483ad913",
+      measurementId: "G-1KR5NJ9T61"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const SECRET_PASS = "arafat01721313101";
+    let editingId = null;
+    let moviesCache = {};
+
+    window.login = function() {
+      const pass = document.getElementById('admin-pass').value;
+      if (pass === SECRET_PASS) {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        loadMovies();
+      } else {
+        alert("ভুল পাসওয়ার্ড!");
+      }
+    };
+
+    window.addLinkCard = function(labelVal = "", urlVal = "", isNew = false, dateVal = "") {
+      const container = document.getElementById('links-container');
+      const div = document.createElement('div');
+      div.className = 'link-card';
+      
+      const today = "28/09/2026";
+      const uploadDate = dateVal || today;
+
+      div.innerHTML = `
+        <div class="link-card-row">
+          <input type="text" placeholder="এপিসোড (যেমন: Episode: 01 720p)" class="link-label" value="${labelVal}" required>
+          <label class="checkbox-label">
+            <input type="checkbox" class="link-is-new" ${isNew ? 'checked' : ''}> [New] Tag
+          </label>
+        </div>
+        <div class="link-card-row">
+          <input type="text" placeholder="আপলোড তারিখ (যেমন: 28/09/2026)" class="link-date" value="${uploadDate}">
+          <input type="url" placeholder="আসল ডাউনলোড লিংক" class="link-url" value="${urlVal}" required>
+        </div>
+      `;
+      container.appendChild(div);
+    };
+
+    window.resetForm = function() {
+      editingId = null;
+      document.getElementById('movie-form').reset();
+      document.getElementById('submit-btn').innerText = "Publish Content";
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      document.getElementById('links-container').innerHTML = '';
+      addLinkCard();
+    };
+
+    document.getElementById('movie-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const labels = document.querySelectorAll('.link-label');
+      const urls = document.querySelectorAll('.link-url');
+      const isNews = document.querySelectorAll('.link-is-new');
+      const dates = document.querySelectorAll('.link-date');
+      const links = [];
+
+      labels.forEach((label, index) => {
+        if(label.value && urls[index].value) {
+          links.push({ 
+            label: label.value, 
+            url: urls[index].value,
+            isNew: isNews[index].checked,
+            date: dates[index].value || "28/09/2026"
+          });
+        }
+      });
+
+      const movieData = {
+        type: document.getElementById('type').value,
+        title: document.getElementById('title').value,
+        poster: document.getElementById('poster').value,
+        category: document.getElementById('category').value,
+        rating: document.getElementById('rating').value || "N/A",
+        year: document.getElementById('year').value || "2026",
+        language: document.getElementById('language').value || "Dual Audio",
+        synopsis: document.getElementById('synopsis').value || "",
+        links: links,
+        timestamp: Date.now()
+      };
+
+      if (editingId) {
+        set(ref(db, 'movies/' + editingId), movieData).then(() => {
+          alert("সফলভাবে আপডেট করা হয়েছে এবং ওপরে নিয়ে যাওয়া হয়েছে!");
+          resetForm();
+        });
+      } else {
+        const newRef = push(ref(db, 'movies'));
+        set(newRef, movieData).then(() => {
+          alert("সফলভাবে পোস্ট করা হয়েছে!");
+          resetForm();
+        });
+      }
+    });
+
+    function loadMovies() {
+      onValue(ref(db, 'movies'), (snapshot) => {
+        const itemsDiv = document.getElementById('movie-items');
+        itemsDiv.innerHTML = "";
+        moviesCache = {};
+
+        snapshot.forEach((child) => {
+          const movie = child.val();
+          const id = child.key;
+          moviesCache[id] = movie;
+
+          itemsDiv.innerHTML += `
+            <div class="movie-item">
+              <div>
+                <strong>${movie.title}</strong> (${movie.category})
+              </div>
+              <div class="action-btns">
+                <button class="btn-edit" onclick="editMovie('${id}')">Edit</button>
+                <button class="btn-delete" onclick="deleteMovie('${id}')">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    window.editMovie = function(id) {
+      const movie = moviesCache[id];
+      if (!movie) return;
+
+      editingId = id;
+      document.getElementById('type').value = movie.type || 'movie';
+      document.getElementById('title').value = movie.title || '';
+      document.getElementById('poster').value = movie.poster || '';
+      document.getElementById('category').value = movie.category || 'Hindi';
+      document.getElementById('rating').value = movie.rating || '';
+      document.getElementById('year').value = movie.year || '';
+      document.getElementById('language').value = movie.language || '';
+      document.getElementById('synopsis').value = movie.synopsis || '';
+
+      const container = document.getElementById('links-container');
+      container.innerHTML = '';
+      
+      if (movie.links && movie.links.length > 0) {
+        movie.links.forEach(link => {
+          addLinkCard(link.label, link.url, link.isNew || false, link.date || "");
+        });
+      } else {
+        addLinkCard();
+      }
+
+      document.getElementById('submit-btn').innerText = "Update Content (Bump to Top)";
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteMovie = function(id) {
+      if(confirm("সত্যিই মুছে ফেলতে চান?")) {
+        remove(ref(db, 'movies/' + id));
+      }
+    };
+
+    addLinkCard();
+  </script>
 </body>
-</html>
+    </html>
