@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- Preconnect & DNS Prefetch for Super Fast Image Loading from ImgBB -->
+  <link rel="preconnect" href="https://i.ibb.co.com" crossorigin>
+  <link rel="dns-prefetch" href="https://i.ibb.co.com">
+  <link rel="preconnect" href="https://i.ibb.co" crossorigin>
+  <link rel="dns-prefetch" href="https://i.ibb.co">
+
   <!-- Google Search Console Verification Tag -->
   <meta name="google-site-verification" content="ihjoW37gTzmEshVOHUNdxKuq4Yj0Zwq0rp4yZm9QGR4" />
 
@@ -32,7 +38,7 @@
     
     /* Header & Top Categories Bar */
     header { background: #161b22; padding: 12px; text-align: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .header-logo-img { width: 32px; height: 32px; border-radius: 6px; }
+    .header-logo-img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
     .logo { color: #58a6ff; font-size: 22px; font-weight: 800; text-decoration: none; letter-spacing: 1px; }
 
     .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; background: #161b22; margin-bottom: 10px; }
@@ -51,15 +57,32 @@
     .movie-card { background: #161b22; border-radius: 10px; overflow: hidden; border: 1px solid #30363d; cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; position: relative; display: flex; flex-direction: column; }
     .movie-card:hover, .movie-card:active { transform: translateY(-6px) scale(1.02); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3); }
 
-    .poster-wrapper { position: relative; width: 100%; aspect-ratio: 2/3; overflow: hidden; background: #21262d; }
-    .poster-img { width: 100%; height: 100%; object-fit: cover; }
-    .badge { position: absolute; top: 6px; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #fff; }
+    /* Skeleton Loading Placeholder Animation */
+    .poster-wrapper { 
+      position: relative; 
+      width: 100%; 
+      aspect-ratio: 2/3; 
+      overflow: hidden; 
+      background: linear-gradient(90deg, #161b22 25%, #21262d 50%, #161b22 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .poster-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s ease-in-out; }
+    .poster-img.loaded { opacity: 1; }
+
+    .badge { position: absolute; top: 6px; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #fff; z-index: 2; }
     .badge-rating { left: 6px; background: #d97706; }
     .badge-quality { right: 6px; background: #2563eb; }
 
     .movie-info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
     
-    /* FIX: Movie Title full visibility with line wrapping */
+    /* Movie Title full visibility with line wrapping */
     .movie-title { 
       font-size: 13px; 
       font-weight: bold; 
@@ -138,7 +161,7 @@
 
   <!-- PAGE 2: Details View -->
   <div id="details-view" class="view-section">
-    <img id="det-poster" class="details-poster" src="" alt="Poster">
+    <img id="det-poster" class="details-poster" src="" alt="Poster" decoding="async">
     <h2 id="det-title" style="color: #f0f6fc; margin-bottom: 8px; line-height: 1.3;"></h2>
     <p id="det-meta" style="color: #38bdf8; margin-bottom: 12px;"></p>
     <p id="det-synopsis" style="color: #8b949e; margin-bottom: 20px; line-height: 1.5; white-space: pre-line;"></p>
@@ -154,9 +177,7 @@
     <div id="timer" class="timer-text">10</div>
     
     <!-- Adsterra 300x250 Banner Code Inside Buffer Page -->
-    <div style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center;">
-      <iframe srcdoc="<style>body{margin:0;padding:0;display:flex;justify-content:center;background:transparent;}</style><script type='text/javascript'>atOptions = {'key' : '0a6e6b07e5799b41f7ef754c17dadcba','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script type='text/javascript' src='https://www.highrevenueformat.com/0a6e6b07e5799b41f7ef754c17dadcba/invoke.js'></script>" width="300" height="250" frameborder="0" scrolling="no"></iframe>
-    </div>
+    <div id="ad-300-slot" style="margin: 20px 0; background: #161b22; padding: 10px; border-radius: 8px; display: flex; justify-content: center;"></div>
 
     <button id="get-link-btn" class="glow-btn" style="display: none;" onclick="goToPage4()">[⬇ GET FINAL DOWNLOAD LINK]</button>
   </div>
@@ -209,6 +230,17 @@
       }
     };
 
+    // Helper function to safely build Adsterra Iframe without breaking JS string parser
+    function getAdIframeHtml(key, width, height) {
+      const doc = `<!DOCTYPE html><html><head><style>body{margin:0;padding:0;display:flex;justify-content:center;background:transparent;}</style></head><body><script type="text/javascript">atOptions={'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}};\x3c/script><script type="text/javascript" src="https://www.highrevenueformat.com/${key}/invoke.js">\x3c/script></body></html>`;
+      return `<iframe srcdoc="${doc.replace(/"/g, '&quot;')}" width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>`;
+    }
+
+    // Image onLoad Handler for smooth fade-in
+    window.onImgLoad = function(img) {
+      img.classList.add('loaded');
+    };
+
     // Realtime Database fetching with Automatic Sorting by Latest Update
     onValue(ref(db, 'movies'), (snapshot) => {
       allMovies = [];
@@ -252,11 +284,22 @@
       const pageItems = filteredMovies.slice(start, end);
 
       pageItems.forEach((movie, index) => {
-        // Dynamic Movie Card
+        const isFirstFew = index < 4;
+        const loadingAttr = isFirstFew ? '' : 'loading="lazy"';
+        const priorityAttr = isFirstFew ? 'fetchpriority="high"' : '';
+
+        // Dynamic Movie Card with Fast Image Loader
         grid.innerHTML += `
           <div class="movie-card" onclick="openDetails('${movie.id}')">
             <div class="poster-wrapper">
-              <img class="poster-img" src="${movie.poster}" alt="${movie.title}" loading="lazy">
+              <img class="poster-img" 
+                   src="${movie.poster}" 
+                   alt="${movie.title}" 
+                   decoding="async" 
+                   ${loadingAttr} 
+                   ${priorityAttr} 
+                   onload="onImgLoad(this)" 
+                   onerror="this.onerror=null;this.src='https://i.ibb.co.com/twrFhX4S/file-00000000d7548211b68d39f49ae33e3b.png';onImgLoad(this);">
               <span class="badge badge-rating">${movie.rating}</span>
               <span class="badge badge-quality">${movie.year}</span>
             </div>
@@ -274,7 +317,7 @@
         if ((index + 1) % 2 === 0) {
           grid.innerHTML += `
             <div class="ad-container">
-              <iframe srcdoc="<style>body{margin:0;padding:0;display:flex;justify-content:center;background:transparent;}</style><script type='text/javascript'>atOptions = {'key' : 'b2ad25fff5b11d91bd1b110ee70a98c7','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};</script><script type='text/javascript' src='https://www.highrevenueformat.com/b2ad25fff5b11d91bd1b110ee70a98c7/invoke.js'></script>" width="320" height="50" frameborder="0" scrolling="no"></iframe>
+              ${getAdIframeHtml('b2ad25fff5b11d91bd1b110ee70a98c7', 320, 50)}
             </div>
           `;
         }
@@ -330,6 +373,10 @@
       selectedLink = url;
 
       document.getElementById('buf-title').innerText = title;
+      
+      // Load 300x250 Ad Banner on Page 3
+      document.getElementById('ad-300-slot').innerHTML = getAdIframeHtml('0a6e6b07e5799b41f7ef754c17dadcba', 300, 250);
+
       showView('buffer-view');
 
       let left = 10;
